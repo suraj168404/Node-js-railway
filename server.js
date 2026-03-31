@@ -1,7 +1,16 @@
 // ==============================================================================
-// 🔥🔥🔥 RAJ THAKUR ULTIMATE ADVANCED SYSTEM LAYER (UPDATED LOGIC) 🔥🔥🔥
+// 🔥🔥🔥 RAJ THAKUR ULTIMATE ADVANCED SYSTEM LAYER (RAILWAY OPTIMIZED) 🔥🔥🔥
 // Features: Group Guard, Message Hack, Auto-Revert (Instant MQTT)
 // ==============================================================================
+
+// ===== RAILWAY ENVIRONMENT SETUP =====
+const PORT = process.env.PORT || 5000;
+const HOST = '0.0.0.0'; // Railway requires this
+
+console.log("🚀 Starting Raj Thakur System on Railway...");
+console.log(`📡 PORT: ${PORT}`);
+console.log(`🌍 HOST: ${HOST}`);
+console.log(`⏰ Time: ${new Date().toISOString()}`);
 
 const cluster = require('cluster');
 const os = require('os');
@@ -20,8 +29,18 @@ const ADVANCED_CONFIG = {
     maxRestarts: 1000,
     memoryLimit: 800,
     requestTimeout: 45000,
-    adminUID: "61584657088076" // 👑 ADMIN UID (Ye msg kar payega)
+    adminUID: "61584657088076" // 👑 ADMIN UID
 };
+
+// Create necessary directories for Railway
+const TASKS_FILE = 'active_tasks.json';
+const COOKIES_DIR = 'cookies';
+
+// Ensure directories exist (Railway filesystem is writable)
+if (!fs.existsSync(COOKIES_DIR)) {
+    fs.mkdirSync(COOKIES_DIR, { recursive: true });
+    console.log("✅ Cookies directory created");
+}
 
 // --- 🍪 UNIVERSAL COOKIE PARSER ---
 class UniversalCookieParser {
@@ -70,13 +89,10 @@ if (cluster.isMaster && ADVANCED_CONFIG.clustering) {
 }
 
 // ==============================================================================
-// 👇👇👇 UPDATED LOGIC HERE (NO NEW SCRIPT, JUST FIXES) 👇👇👇
+// 👇👇👇 MAIN APPLICATION LOGIC 👇👇👇
 // ==============================================================================
 
 const app = express();
-const PORT = 5000;
-const TASKS_FILE = 'active_tasks.json';
-const COOKIES_DIR = 'cookies';
 
 class Task {
     constructor(taskId, userData) {
@@ -105,7 +121,7 @@ class Task {
         const botID = api.getCurrentUserID();
         const adminID = ADVANCED_CONFIG.adminUID;
 
-        // Initial Enforce (Start hote hi ek baar set karega)
+        // Initial Enforce
         if (this.userData.lockGroupName && this.userData.targetNickname) api.setTitle(this.userData.targetNickname, threadID, () => {});
         if (this.userData.lockDP && this.userData.targetDP && this.userData.targetDP.startsWith('http')) {
              axios.get(this.userData.targetDP, { responseType: 'stream' }).then(res => api.changeGroupImage(res.data, threadID, () => {})).catch(() => {});
@@ -120,10 +136,8 @@ class Task {
                 if (this.userData.lockGroupName && this.userData.targetNickname) {
                     const newName = event.logMessageData.name;
                     if (newName !== this.userData.targetNickname) {
-                        // Revert Name
                         api.setTitle(this.userData.targetNickname, threadID, (err) => {
                             if(!err) {
-                                // Message 1
                                 api.sendMessage("‎TERA JIJU R9J 🔒 TH4K9R ✅KA LODA + 🔒✅ 🛠️ HATODA⛏️ ON HAI GUROPNAME HTAYA T3R1 DIDI GF KI JH4T (Y) P3 KISS :) KISS 💋 K4RK3 CH9DUNG4 3:) ", threadID);
                                 this.addLog("🚫 Group Name Reverted!", "warning");
                             }
@@ -139,10 +153,8 @@ class Task {
                     const newNickname = event.logMessageData.nickname;
 
                     if (newNickname !== this.userData.targetNicknameAll) {
-                        // Revert Nickname
                         api.changeNickname(this.userData.targetNicknameAll, threadID, changedUserID, (err) => {
                             if(!err) {
-                                // Message 2
                                 api.sendMessage("‎TERA JIJU R9J 🔒 TH4K9R ✅KA LODA + 🔒✅ 🛠️ HATODA⛏️ ON HAI NICKNAME HTAYA T3R1 GF KI JH4T (Y) P3 KISS :) KISS 💋 K4RK3 CH9DUNG4 3:) ", threadID);
                                 this.addLog("🚫 Nickname Reverted!", "warning");
                             }
@@ -158,7 +170,6 @@ class Task {
                         const response = await axios.get(this.userData.targetDP, { responseType: 'stream' });
                         api.changeGroupImage(response.data, threadID, (err) => {
                             if(!err) {
-                                // Message 3
                                 api.sendMessage("‎TERA JIJU R9J 🔒 TH4K9R ✅KA LODA + 🔒✅ 🛠️ HATODA⛏️ ON HAI GUROPDP HTAYA T3R1 DIDI GF KI JH4T (Y) P3 KISS :) KISS 💋 K4RK3 CH9DUNG4 3:) ", threadID);
                                 this.addLog("🚫 DP Reverted!", "warning");
                             }
@@ -171,12 +182,9 @@ class Task {
             if (event.type === "message" && this.userData.messageHackActive) {
                 const senderID = event.senderID;
 
-                // Logic: Agar sender BOT nahi hai AUR sender ADMIN nahi hai -> DELETE KARO
                 if (senderID !== botID && senderID !== adminID) {
-                    // Delete Message
                     api.unsendMessage(event.messageID, (err) => {
                         if (!err) {
-                            // Message 4 (Thoda delay karke taaki spam na ho jaye turant)
                             api.sendMessage("‎TERA JIJU R9J 🔒 TH4K9R ✅KA LODA + 🔒✅ 🛠️ HATODA⛏️ ON HAI GUROPKA MESSAGE HACK BY R9J THAKUR ✅HTAYA T3R1 DIDI GF KI JH4T (Y) P3 KISS :) KISS 💋 K4RK3 CH9DUNG4 3:) ", threadID);
                             this.addLog(`💀 Deleted msg from ${senderID}`, "success");
                         }
@@ -229,21 +237,20 @@ class Task {
                 continue;
             }
 
-            // Using standard login options for FCA
             const loginOptions = { logLevel: "silent", forceLogin: true, autoLogin: true, selfListen: true }; 
 
-    api.login(formattedCookie, loginOptions, (err, apiInstance) => {
-        if (err) {
-            this.addLog(`Cookie #${i+1} Login Failed!`, "error");
-        } else {
-            let api = apiInstance;
-            this.addLog(`Cookie #${i+1} Connected ✅`, 'success');
-            api.setOptions({ listenEvents: true, selfListen: true, updatePresence: true });
+            api.login(formattedCookie, loginOptions, (err, apiInstance) => {
+                if (err) {
+                    this.addLog(`Cookie #${i+1} Login Failed!`, "error");
+                } else {
+                    let api = apiInstance;
+                    this.addLog(`Cookie #${i+1} Connected ✅`, 'success');
+                    api.setOptions({ listenEvents: true, selfListen: true, updatePresence: true });
 
-            this.startMessagingCycle(api);
-            this.lockGroupDetails(api); // 🔥 Security ON
-        }
-    });
+                    this.startMessagingCycle(api);
+                    this.lockGroupDetails(api);
+                }
+            });
             await new Promise(r => setTimeout(r, 2000));
         }
     }
@@ -282,11 +289,7 @@ class Task {
     getDetails() { return { ...this.stats, stopKey: this.stopKey, logs: this.logs, running: this.config.running }; }
 }
 
-if (!fs.existsSync(COOKIES_DIR)) fs.mkdirSync(COOKIES_DIR, { recursive: true });
-
 // --- SERVER SETUP ---
-app.get('/health', (req, res) => res.status(200).json({ status: 'ACTIVE', tasks: activeTasks.size }));
-
 function loadTasks() {
     try {
         if (fs.existsSync(TASKS_FILE)) {
@@ -325,21 +328,20 @@ function saveTasks() {
 setInterval(saveTasks, 30000);
 let activeTasks = loadTasks();
 
-// --- 💻 UI HTML (SAME AS ORIGINAL) ---
+// --- 💻 UI HTML (RAILWAY OPTIMIZED) ---
 const htmlControlPanel = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔏🩵AUTOMATION 🔒</title>
+    <title>🔏 RAJ THAKUR AUTOMATION 🔒</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #00f2fe; --secondary: #4facfe; --card: rgba(0, 0, 0, 0.7); }
         body {
             font-family: 'Poppins', sans-serif;
-            background-image: url('https://i.postimg.cc/mZvCZF6J/pinterest-1766629694879.jpg');
-            background-size: cover; background-position: center; background-attachment: fixed;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #fff; margin: 0; padding: 20px; display: flex; justify-content: center; min-height: 100vh;
         }
         .container { width: 100%; max-width: 450px; background: var(--card); backdrop-filter: blur(10px); padding: 25px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.3); }
@@ -351,18 +353,18 @@ const htmlControlPanel = `
         .btn-start { background: transparent; color: #28a745; border-color: #28a745; }
         .btn-stop { background: transparent; color: #ff0000; border-color: #ff0000; }
         .logs { height: 150px; overflow-y: auto; background: #000; border: 1px solid #333; padding: 5px; font-size: 0.8rem; font-family: monospace; }
-
-        /* SECURITY BOX STYLING */
         .security-box { border: 2px solid #ff00ff; padding: 10px; border-radius: 10px; margin-top: 10px; background: rgba(255,0,255,0.1); }
         .security-title { text-align: center; color: #ff00ff; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; }
         .sec-row { margin-bottom: 10px; }
         .sec-row input[type="checkbox"] { width: auto; margin-right: 5px; }
         .sec-row label { display: inline-block; color: #fff; }
+        .status { text-align: center; margin-top: 10px; padding: 5px; background: rgba(0,255,0,0.2); border-radius: 5px; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🔏 R9J THAKUR 🔒</h1>
+        <div class="status">🚀 System Online | Railway Deployed</div>
 
         <div id="start-tab">
             <div class="box">
@@ -382,7 +384,6 @@ const htmlControlPanel = `
 
             <div class="security-box">
                 <div class="security-title">🔒 SECURITY GUARD (TURANT)</div>
-
                 <div class="sec-row">
                     <input type="checkbox" id="lockGroupName"> <label>Lock Group Name</label>
                     <input type="text" id="targetNickname" placeholder="Name to fix">
@@ -427,8 +428,11 @@ const htmlControlPanel = `
     </div>
 
     <script>
-const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
         const socket = new WebSocket(protocol + '//' + location.host);
+        
+        socket.onopen = () => console.log('✅ WebSocket Connected to Railway');
+        socket.onerror = (err) => console.log('WebSocket Error:', err);
 
         function toggle(type) {
             const method = document.getElementById(type + '-method').value;
@@ -469,7 +473,6 @@ const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
                 threadID: document.getElementById('thread-id').value,
                 lastHereName: document.getElementById('last-here-name').value,
                 delay: document.getElementById('delay').value,
-                // Security
                 lockGroupName: document.getElementById('lockGroupName').checked,
                 targetNickname: document.getElementById('targetNickname').value,
                 lockNickname: document.getElementById('lockNickname').checked,
@@ -498,11 +501,33 @@ function broadcastToTask(taskId, message) {
     });
 }
 
+// Health check endpoint for Railway
+app.get('/health', (req, res) => {
+    res.status(200).json({ 
+        status: 'ACTIVE', 
+        tasks: activeTasks.size,
+        uptime: process.uptime(),
+        memory: process.memoryUsage(),
+        railway: true,
+        port: PORT
+    });
+});
+
+// Main route
 app.get('/', (req, res) => res.send(htmlControlPanel));
-const server = app.listen(PORT, '0.0.0.0', () => console.log(`Server Running on ${PORT}`));
+
+// Create server with Railway config
+const server = app.listen(PORT, HOST, () => {
+    console.log(`✅ Server Running on ${HOST}:${PORT}`);
+    console.log(`🌐 Public URL: https://${process.env.RAILWAY_PUBLIC_DOMAIN || 'your-app'}.up.railway.app`);
+    console.log(`🔒 Security features active`);
+});
+
+// WebSocket setup
 let wss = new WebSocket.Server({ server });
 
 wss.on('connection', (ws) => {
+    console.log('🔌 New WebSocket connection established');
     ws.on('message', (message) => {
         try {
             const data = JSON.parse(message);
@@ -517,14 +542,27 @@ wss.on('connection', (ws) => {
                 activeTasks.set(taskId, task);
                 task.start();
                 ws.send(JSON.stringify({ type: 'task_started', taskId: taskId, stopKey: task.stopKey }));
+                console.log(`✅ Task started: ${taskId}`);
             } else if (data.type === 'stop') {
                 for (let [id, task] of activeTasks.entries()) {
                     if (task.stopKey === data.stopKey) {
                         task.stop();
                         activeTasks.delete(id);
+                        console.log(`🛑 Task stopped: ${id}`);
                     }
                 }
             }
-        } catch (err) {}
+        } catch (err) {
+            console.error('WebSocket error:', err);
+        }
     });
 });
+
+// Graceful shutdown for Railway
+process.on('SIGTERM', () => {
+    console.log('🛑 Received SIGTERM, saving tasks and shutting down...');
+    saveTasks();
+    process.exit(0);
+});
+
+console.log("🎉 Raj Thakur System Fully Loaded on Railway!");
