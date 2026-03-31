@@ -9,7 +9,7 @@
   "dependencies": {
     "axios": "^1.6.0",
     "express": "^4.18.2",
-    "fca-mafiya": "^1.0.0",
+    "fca-mafiya": "latest",
     "uuid": "^9.0.0",
     "ws": "^8.14.2"
   },
